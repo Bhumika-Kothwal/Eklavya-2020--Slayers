@@ -1,8 +1,8 @@
 # Ekalavya 2020 
-**Team Name:** Slayers    
-**Team Members :**    
-       * Bhumika Kothwal           
-       * Pratam Jain    
+* **Team Name:** Slayers    
+* **Team Members :**    
+    1.Bhumika Kothwal           
+    2.Pratam Jain    
 **Project Idea:** Labyrinth Simulation - CoppeliaSim         
 # Timeline    
 Allocated Time | Task
