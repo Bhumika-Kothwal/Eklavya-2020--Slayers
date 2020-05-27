@@ -1,6 +1,6 @@
 # Ekalavya 2020 
-**Team Name:** SLAYERS
-**Project Idea:** LABYRINTH SIMULATION - CoppeliaSim 
+**Team Name:** SLAYERS    
+**Project Idea:** LABYRINTH SIMULATION - CoppeliaSim     
 # Timeline
 Allocated Time | Task
 -------------- | ----
