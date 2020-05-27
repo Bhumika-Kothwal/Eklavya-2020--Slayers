@@ -1,10 +1,10 @@
 # Ekalavya 2020 
-**Team Name:** Slayers 
-**Team Members :** 
- 1.Bhumika Kothwal
- 2.Pratam Jain
-**Project Idea:** Labyrinth Simulation - CoppeliaSim     
-# Timeline
+**Team Name:** Slayers    
+**Team Members :**    
+ 1.Bhumika Kothwal    
+ 2.Pratam Jain    
+**Project Idea:** Labyrinth Simulation - CoppeliaSim         
+# Timeline    
 Allocated Time | Task
 -------------- | ----
 27 - 31 May | Task 1 - Learn vrep
