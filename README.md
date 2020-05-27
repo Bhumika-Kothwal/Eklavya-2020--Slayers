@@ -1,7 +1,7 @@
-# **Ekalavya 2020** 
-### TEAM NAME    :- SLAYERS
-### PROJECT IDEA :- LABYRINTH SIMULATION - CoppeliaSim 
-### TIMELINE     :-
+# Ekalavya 2020 
+**Team Name:** SLAYERS
+**Project Idea:** LABYRINTH SIMULATION - CoppeliaSim 
+# Timeline
 Allocated Time | Task
 -------------- | ----
 27 - 31 May | Task 1 - Learn vrep
