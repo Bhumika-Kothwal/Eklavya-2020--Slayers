@@ -4,7 +4,7 @@
         1.Bhumika Kothwal           
         2.Pratam Jain    
 * **Project Idea:** Labyrinth Simulation - CoppeliaSim         
-# Timeline       
+## Timeline       
 Allocated Time | Task
 -------------- | ----
 27 - 31 May | Task 1 - Learn vrep
