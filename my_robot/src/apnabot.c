@@ -45,6 +45,8 @@ int main(int argc,char* argv[])
 
         /******************** SETUP ******************************/
         // write code here that you wish to perform ONCE
+	while(1)
+	{
         simxSetJointTargetVelocity(clientID,leftMotorHandle,leftMotorSpeed,simx_opmode_oneshot);
         simxSetJointTargetVelocity(clientID,rightMotorHandle,rightMotorSpeed,simx_opmode_oneshot);
         /*********************************************************/
