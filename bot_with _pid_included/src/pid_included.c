@@ -10,13 +10,13 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define MAX_PWM 5
+#define MAX_PWM 10
 #define MIN_PWM 1
 
 //Line Following Tuning Parameters
-float yaw_kP= 0.56;
-float yaw_kI= 0.1;
-float yaw_kD= 0.17;
+float yaw_kP= 0.4;
+float yaw_kI= 0.0;
+float yaw_kD= 0.3;
 
 //FOR LINE FOLLOWING
 float yaw_error=0, yaw_prev_error=0, yaw_difference=0, yaw_cumulative_error=0, yaw_correction=0;
@@ -35,8 +35,6 @@ int main(int argc,char* argv[])
     int portNb=-1;
     int leftMotorHandle;
     int rightMotorHandle;  
-    int botbase;
-	int reference;
 	int sensor[4];
     // number of variables passed from lua to this code + 1
     // (+1 because the first value in argv is always the location of this program)
@@ -71,7 +69,7 @@ int main(int argc,char* argv[])
 
     // start communication with coppeliasim
     int clientID=simxStart((simxChar*)"127.0.0.1",portNb,true,true,2000,5);
-
+	int speed = 0.1;
     if (clientID!=-1){
         printf("connection established...\n");
 		float time=0;
@@ -106,7 +104,7 @@ int main(int argc,char* argv[])
     		float weighted_sum = 0, sum = 0, pos = 0;
     
     		for(int i = 0; i < 4; i++){
-        		if(svalue[i] > 0.6)
+        		if(svalue[i] < 0.5)
         			all_black_flag = 0;
        			weighted_sum += (float)(svalue[i]) * (weights[i]);
         		sum += svalue[i];
@@ -117,9 +115,9 @@ int main(int argc,char* argv[])
 			if(all_black_flag == 1)
     		{
         		if(yaw_error > 0)
-            		pos = 0.2;
+            		pos = 0.15;
         		else
-            		pos = -0.2;
+            		pos = -0.15;
     		}
 
     		yaw_error = pos;
@@ -128,27 +126,28 @@ int main(int argc,char* argv[])
     		yaw_difference = (yaw_error - yaw_prev_error);
     		yaw_cumulative_error += yaw_error;
     
-    		if(yaw_cumulative_error > 3)
-    		    yaw_cumulative_error = 3;
+    		if(yaw_cumulative_error > 0.3)
+    		    yaw_cumulative_error = 0.3;
         
-    		else if(yaw_cumulative_error < -3)
-    		    yaw_cumulative_error = -3;
+    		else if(yaw_cumulative_error < -0.3)
+    		    yaw_cumulative_error = -0.3;
     
 			yaw_correction = yaw_kP*yaw_error + yaw_kI*yaw_cumulative_error + yaw_kD*yaw_difference;
 		    yaw_prev_error = yaw_error;
-           	right_pwm = constrain(( yaw_correction), MIN_PWM, MAX_PWM);
-            left_pwm = constrain((-1*yaw_correction), MIN_PWM, MAX_PWM);
+			
+           	right_pwm = constrain((speed+ yaw_correction), MIN_PWM, MAX_PWM);
+            left_pwm = constrain((speed-yaw_correction), MIN_PWM, MAX_PWM);
                        
             //Extra yaw correction during turns
-            if(yaw_error>0.1)
+            if(yaw_error>0.05)
             {
-                right_pwm+=1.5;
-                left_pwm-=1.5;   
+                right_pwm-=0.2;
+                left_pwm+=0.2;   
             }
-            else if(yaw_error<-0.1)
+            else if(yaw_error<0.05)
             {
-                left_pwm+=1.5;
-                right_pwm-=1.5;
+                left_pwm-=0.2;
+                right_pwm+=0.2;
             }
                 
          	move(clientID,leftMotorHandle,rightMotorHandle,left_pwm,right_pwm);
