@@ -103,7 +103,9 @@ int main(int argc,char* argv[])
             printf("the sensor values: %f %f %f %f\n",sensor_value[0],sensor_value[1],sensor_value[2],sensor_value[3]);
      		
 		if(sensor_value[0]>0 && sensor_value[1]>0 && sensor_value[2]>0 && sensor_value[3]>0){
-            if(sensor_value[0]<0.4 && sensor_value[1]<0.4 && sensor_value[2]<0.4 && sensor_value[3]>0.7)			//pure left turn
+
+
+            if(sensor_value[0]<0.4 && sensor_value[1]<0.4 && sensor_value[2]<0.4 && sensor_value[3]>0.7)			//pure left or straight left turn
 			{           
 
                 while(simxGetConnectionId(clientID)!=-1)
@@ -159,7 +161,8 @@ int main(int argc,char* argv[])
 			}
 			
 					
-		    else if(sensor_value[3]<0.4 && sensor_value[1]<0.4 && sensor_value[2]<0.4 && sensor_value[0]>0.7)			//pure right turn detected
+
+		    else if(sensor_value[3]<0.4 && sensor_value[1]<0.4 && sensor_value[2]<0.4 && sensor_value[0]>0.7)			//pure right or straight right turn detected
 			{        
 		
 				while(simxGetConnectionId(clientID)!=-1)
@@ -198,7 +201,8 @@ int main(int argc,char* argv[])
 			}
 			
 
-			else if(sensor_value[3]<0.4 && sensor_value[1]<0.4 && sensor_value[2]<0.4 && sensor_value[0]<0.4)								//for junction
+
+			else if(sensor_value[3]<0.4 && sensor_value[1]<0.4 && sensor_value[2]<0.4 && sensor_value[0]<0.4)								//for junction or t-shape
 			{
 				while(simxGetConnectionId(clientID)!=-1)
                 {   //reading sensors
@@ -322,10 +326,7 @@ int main(int argc,char* argv[])
 					if( simxReadVisionSensor(clientID, sensor[3], NULL, &auxValues, &auxValuesCount,simx_opmode_buffer) == simx_return_ok){
                			sensor_value[3] = auxValues[10];
             		}
-					bool b;
-					b = sensor_value[0]>0.4 && sensor_value[1]>0.3 && sensor_value[2]>0.3 && sensor_value[3]>0.4;
-					
-            		printf("the sensor values straight-line***: %f %f %f %f  %d \n",sensor_value[0],sensor_value[1],sensor_value[2],sensor_value[3] ,b);
+		
             		
             		if(sensor_value[0]>0.4 && sensor_value[1]>0.3 && sensor_value[2]>0.3 && sensor_value[3]>0.4)
             		{
