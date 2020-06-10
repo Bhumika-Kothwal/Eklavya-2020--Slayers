@@ -263,7 +263,7 @@ int main(int argc,char* argv[])
 								}
 							 }
 						  }
-						  else if(sensor_value[0]>0.4 && sensor_value[1]<0.4 && sensor_value[2]<0.4 && sensor_value[3]>0.4)	
+						  else if(sensor_value[0]>0.4 && sensor_value[1]<0.4 && sensor_value[2]<0.4 && sensor_value[3]>0.4)	      //for junction
 						  {
 							while(simxGetConnectionId(clientID)!=-1)
                 		  	{   //reading sensors
