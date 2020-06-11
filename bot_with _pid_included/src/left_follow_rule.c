@@ -68,6 +68,15 @@ int main(int argc,char* argv[])
 	int c=0;
 	float sensor_value[4];
 	float turn_speed= 1;
+	
+	int junction= 0;
+	int tshape=0;
+	int straight_left = 0;
+	int straight_right = 0;
+	int pure_left = 0;
+	int pure_right=0;
+	int u_turn = 0;
+	
     // for details on these functions refer: https://www.coppeliarobotics.com/helpFiles/en/remoteApiFunctions.htm
 
     // start communication with coppeliasim
@@ -101,8 +110,11 @@ int main(int argc,char* argv[])
                sensor_value[3] = auxValues[10];
             }
             printf("the sensor values: %f %f %f %f\n",sensor_value[0],sensor_value[1],sensor_value[2],sensor_value[3]);
+
      		
 		if(sensor_value[0]>0 && sensor_value[1]>0 && sensor_value[2]>0 && sensor_value[3]>0){
+
+
 
 
             if(sensor_value[0]<0.4 && sensor_value[1]<0.4 && sensor_value[2]<0.4 && sensor_value[3]>0.7)			//pure left or straight left turn
@@ -132,31 +144,80 @@ int main(int argc,char* argv[])
          				move(clientID,leftMotorHandle,rightMotorHandle,turn_speed,turn_speed);
                    	else
                    	{
-                   		if(sensor_value[0]>0.7 && sensor_value[1]>0.7 && sensor_value[2]>0.7 && sensor_value[3]>0.7)
+                   		if(sensor_value[0]>0.7 && sensor_value[1]>0.7 && sensor_value[2]>0.7 && sensor_value[3]>0.7)			//pure left
                    		{
-                   			if(sensor_value[0]>0.7 && sensor_value[1]<0.4 && sensor_value[2]<0.4 && sensor_value[3]>0.7)
-							{		//straight line
-									printf("bye bye pure left\n");
-									break;
-							}
-							else
-                          		move(clientID,leftMotorHandle,rightMotorHandle,-1*turn_speed,turn_speed);    	//turns left
-                   		}
-           				else
-           				{
-                   			 	if(sensor_value[0]>0.7 && sensor_value[1]<0.4 && sensor_value[2]<0.4 && sensor_value[3]>0.7)
+							while(simxGetConnectionId(clientID)!=-1)
+                			{   //reading sensor values
+                 				simxReadVisionSensor(clientID, sensor[0], NULL, &auxValues, &auxValuesCount,simx_opmode_streaming);
+								if( simxReadVisionSensor(clientID, sensor[0], NULL, &auxValues, &auxValuesCount,simx_opmode_buffer) == simx_return_ok){
+               						sensor_value[0] = auxValues[10];
+            					}
+								simxReadVisionSensor(clientID, sensor[1], NULL, &auxValues, &auxValuesCount,simx_opmode_streaming);
+								if( simxReadVisionSensor(clientID, sensor[1], NULL, &auxValues, &auxValuesCount,simx_opmode_buffer) == simx_return_ok){
+               						sensor_value[1] = auxValues[10];
+            					}
+								simxReadVisionSensor(clientID, sensor[2], NULL, &auxValues, &auxValuesCount,simx_opmode_streaming);
+								if( simxReadVisionSensor(clientID, sensor[2], NULL, &auxValues, &auxValuesCount,simx_opmode_buffer) == simx_return_ok){
+               						sensor_value[2] = auxValues[10];
+            					}
+								simxReadVisionSensor(clientID, sensor[3], NULL, &auxValues, &auxValuesCount,simx_opmode_streaming);
+								if( simxReadVisionSensor(clientID, sensor[3], NULL, &auxValues, &auxValuesCount,simx_opmode_buffer) == simx_return_ok){
+               						sensor_value[3] = auxValues[10];
+            					}
+            					printf("the sensor values l/sl***: %f %f %f %f\n",sensor_value[0],sensor_value[1],sensor_value[2],sensor_value[3]);
+                   				if(sensor_value[0]>0.7 && sensor_value[1]<0.4 && sensor_value[2]<0.4 && sensor_value[3]>0.7)		
 								{		//straight line
-									a = a + 1;
-									if( a == 2)
-									{  	a = 0;
-										printf("bye bye straight left\n");
-										break;
-									}
+									printf("bye bye pure left\n");
+									++pure_left;
+									c=1;
+									break;
 								}
 								else
-                          			move(clientID,leftMotorHandle,rightMotorHandle,-1*turn_speed,turn_speed);    	//turns left
+                          			move(clientID,leftMotorHandle,rightMotorHandle,-1*turn_speed,turn_speed);   	//turns left
+							}
+                   		}
+					
+           				else if(sensor_value[0]>0.4 && sensor_value[1]<0.4 && sensor_value[2]<0.4 && sensor_value[3]>0.4)				//straight left
+           				{
+								while(simxGetConnectionId(clientID)!=-1)
+               					{   //reading sensor values
+                 					simxReadVisionSensor(clientID, sensor[0], NULL, &auxValues, &auxValuesCount,simx_opmode_streaming);
+									if( simxReadVisionSensor(clientID, sensor[0], NULL, &auxValues, &auxValuesCount,simx_opmode_buffer) == simx_return_ok){
+               							sensor_value[0] = auxValues[10];
+            						}
+									simxReadVisionSensor(clientID, sensor[1], NULL, &auxValues, &auxValuesCount,simx_opmode_streaming);
+									if( simxReadVisionSensor(clientID, sensor[1], NULL, &auxValues, &auxValuesCount,simx_opmode_buffer) == simx_return_ok){
+               							sensor_value[1] = auxValues[10];
+            							}
+									simxReadVisionSensor(clientID, sensor[2], NULL, &auxValues, &auxValuesCount,simx_opmode_streaming);
+									if( simxReadVisionSensor(clientID, sensor[2], NULL, &auxValues, &auxValuesCount,simx_opmode_buffer) == simx_return_ok){
+               							sensor_value[2] = auxValues[10];
+            						}
+									simxReadVisionSensor(clientID, sensor[3], NULL, &auxValues, &auxValuesCount,simx_opmode_streaming);
+									if( simxReadVisionSensor(clientID, sensor[3], NULL, &auxValues, &auxValuesCount,simx_opmode_buffer) == simx_return_ok){
+               							sensor_value[3] = auxValues[10];
+            						}
+            						printf("the sensor values l/sl***: %f %f %f %f\n",sensor_value[0],sensor_value[1],sensor_value[2],sensor_value[3]);
+                   			 		if(sensor_value[0]>0.7 && sensor_value[1]<0.4 && sensor_value[2]<0.4 && sensor_value[3]>0.7)		//straight line
+									{		
+										a = a + 1;
+										if( a == 2)
+										{  	a = 0;
+											c=1;
+											printf("bye bye straight left\n");
+											++straight_left;
+											break;
+										}
+									}
+									else
+                          				move(clientID,leftMotorHandle,rightMotorHandle,-1*turn_speed,turn_speed);    	//turns left
+								}
                          }
                      }
+                     if (c == 1){
+						c = 0;
+						break;
+					}
             	}	
 			}
 			
@@ -185,17 +246,56 @@ int main(int argc,char* argv[])
             		}
             		printf("the sensor values r/sr***: %f %f %f %f\n",sensor_value[0],sensor_value[1],sensor_value[2],sensor_value[3]);
 
-					if(sensor_value[0]>0.7 && sensor_value[1]<0.7 && sensor_value[2]<0.7 && sensor_value[3]<0.7)
+					if(sensor_value[0]>0.7 && sensor_value[1]<0.4 && sensor_value[2]<0.4 && sensor_value[3]<0.4)
                     	move(clientID,leftMotorHandle,rightMotorHandle,turn_speed,turn_speed);
                    
                    else
-                   { 	if(sensor_value[0]>0.7 && sensor_value[1]<0.4 && sensor_value[2]<0.4 && sensor_value[3]>0.7)
-						{	//straight line
-							printf("ByE bYe \n");
+                   { 	
+                   		
+                      if(sensor_value[0]>0.7 && sensor_value[1]>0.7 && sensor_value[2]>0.7 && sensor_value[3]>0.7)		//pure right
+                      {
+							while(simxGetConnectionId(clientID)!=-1)
+                			{   //reading sensor values
+                 				simxReadVisionSensor(clientID, sensor[0], NULL, &auxValues, &auxValuesCount,simx_opmode_streaming);
+								if( simxReadVisionSensor(clientID, sensor[0], NULL, &auxValues, &auxValuesCount,simx_opmode_buffer) == simx_return_ok){
+               						sensor_value[0] = auxValues[10];
+            					}
+								simxReadVisionSensor(clientID, sensor[1], NULL, &auxValues, &auxValuesCount,simx_opmode_streaming);
+								if( simxReadVisionSensor(clientID, sensor[1], NULL, &auxValues, &auxValuesCount,simx_opmode_buffer) == simx_return_ok){
+               						sensor_value[1] = auxValues[10];
+            					}
+								simxReadVisionSensor(clientID, sensor[2], NULL, &auxValues, &auxValuesCount,simx_opmode_streaming);
+								if( simxReadVisionSensor(clientID, sensor[2], NULL, &auxValues, &auxValuesCount,simx_opmode_buffer) == simx_return_ok){
+               						sensor_value[2] = auxValues[10];
+            					}
+								simxReadVisionSensor(clientID, sensor[3], NULL, &auxValues, &auxValuesCount,simx_opmode_streaming);
+								if( simxReadVisionSensor(clientID, sensor[3], NULL, &auxValues, &auxValuesCount,simx_opmode_buffer) == simx_return_ok){
+               						sensor_value[3] = auxValues[10];
+            					}
+            					printf("the sensor values pure right: %f %f %f %f\n",sensor_value[0],sensor_value[1],sensor_value[2],sensor_value[3]);
+                   				if(sensor_value[0]>0.7 && sensor_value[1]<0.4 && sensor_value[2]<0.4 && sensor_value[3]>0.7)
+								{	//straight line
+									printf("ByE bYe pure right\n");
+									++pure_right;
+									c=1;
+									break;
+								}
+								else
+                    		   		move(clientID,leftMotorHandle,rightMotorHandle,turn_speed,-1*turn_speed);		//turns right
+							}
+                      }
+                       
+                      else if(sensor_value[0]>0.7 && sensor_value[1]<0.4 && sensor_value[2]<0.4 && sensor_value[3]>0.7)			//straight-right
+                      {
+							printf("ByE bYe pure right\n");
+							++straight_right;
 							break;
-						}
-						else
-                    	   	move(clientID,leftMotorHandle,rightMotorHandle,turn_speed,-1*turn_speed);		//turns right
+                      }
+                       	
+					}
+					if (c == 1){
+						c = 0;
+						break;
 					}
 				}
 			}
@@ -232,7 +332,7 @@ int main(int argc,char* argv[])
 					{
 						if(sensor_value[0]>0.4 && sensor_value[1]>0.4 && sensor_value[2]>0.4 && sensor_value[3]>0.4)		//t-shape	
 						{	
-						  	while(simxGetConnectionId(clientID)!=-1)
+							while(simxGetConnectionId(clientID)!=-1)
                 		  	{   //reading sensors
 								simxReadVisionSensor(clientID, sensor[0], NULL, &auxValues, &auxValuesCount,simx_opmode_streaming);
 								if( simxReadVisionSensor(clientID, sensor[0], NULL, &auxValues, &auxValuesCount,simx_opmode_buffer) == simx_return_ok){
@@ -255,6 +355,7 @@ int main(int argc,char* argv[])
 								{	//straight line
 										c = 1;
 										printf("ByE bYe t-shape\n");
+										++tshape;
 										break;
 								
 								}
@@ -262,9 +363,9 @@ int main(int argc,char* argv[])
                     			   	move(clientID,leftMotorHandle,rightMotorHandle,-1*turn_speed,turn_speed);		//turns left
 								}
 							 }
-						  }
-						  else if(sensor_value[0]>0.4 && sensor_value[1]<0.4 && sensor_value[2]<0.4 && sensor_value[3]>0.4)	      //for junction
-						  {
+						}
+						else if(sensor_value[0]>0.4 && sensor_value[1]<0.4 && sensor_value[2]<0.4 && sensor_value[3]>0.4)				//junction
+						{
 							while(simxGetConnectionId(clientID)!=-1)
                 		  	{   //reading sensors
 								simxReadVisionSensor(clientID, sensor[0], NULL, &auxValues, &auxValuesCount,simx_opmode_streaming);
@@ -284,22 +385,23 @@ int main(int argc,char* argv[])
                						sensor_value[3] = auxValues[10];
             					}
             					printf("the sensor values junction***: %f %f %f %f  \n",sensor_value[0],sensor_value[1],sensor_value[2],sensor_value[3]);
-								if(sensor_value[0]>0.7 && sensor_value[1]<0.4 && sensor_value[2]<0.4 && sensor_value[3]>0.7)			//junction
+								if(sensor_value[0]>0.7 && sensor_value[1]<0.4 && sensor_value[2]<0.4 && sensor_value[3]>0.7)			
 								{	//straight line
 									a = a+1;
 									if(a==2)
 									{	a = 0;
 										c =1;
 										printf("ByE bYe junc\n");
+										++junction;
 										break;
 									}
 								}
 								else{	printf("junc aaya so left turn\n");
                     		   		move(clientID,leftMotorHandle,rightMotorHandle,-1*turn_speed,turn_speed);		//turns left
 								}
-							  }
-                    	     }
-						}
+							 }
+                    	 }
+					}
 					if (c == 1){
 						c = 0;
 						break;
@@ -352,10 +454,11 @@ int main(int argc,char* argv[])
             				if(sensor_value[0]>0.7 && sensor_value[1]<0.4 && sensor_value[2]<0.4 && sensor_value[3]>0.7)			
 							{	//straight line
 									printf("ByE bYe u-turn\n");
+									++u_turn;
 									break;
 							}
 							else{	printf("dead end aaya so left turn\n");
-                    		   	move(clientID,leftMotorHandle,rightMotorHandle,-1*turn_speed,turn_speed);		//turns left
+                    		   	move(clientID,leftMotorHandle,rightMotorHandle,-1*turn_speed,turn_speed);		//turns 180 left turn
 							}
 						}	
             		}		
@@ -427,6 +530,13 @@ int main(int argc,char* argv[])
         simxFinish(clientID);
 	
     }
+    printf("junction: %d\n", junction);
+    printf("T-shape: %d\n", tshape);
+    printf("straight left: %d\n", straight_left);
+    printf("pure left: %d\n", pure_left);
+    printf("straight right: %d\n", straight_right);
+    printf("pure right: %d\n", pure_right);
+	printf("u-turn: %d\n", u_turn);
     printf("Simulation Stopped!");
 }
 
