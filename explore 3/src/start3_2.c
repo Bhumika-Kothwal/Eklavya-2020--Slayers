@@ -47,6 +47,7 @@ int encoder_value();
 int move(int clientID,int leftMotorHandle,int rightMotorHandle,float left_pwm,float right_pwm);
 float constrain(float x, float lower_limit, float higher_limit);
 
+
 //for turn func
 int sensor[5];
 												int unexplored[1000];
@@ -55,6 +56,9 @@ int sensor[5];
 int junc_check();
 int old_node(int i);
 int turn(int clientID, int leftMotorHandle,int rightMotorHandle,int leftMotorSpeed,int rightMotorSpeed, int count, float sensor_value[]);
+int find(int explore[],int type[],int cordinate[][2],int k,int total_points);		//pratam
+int travel(int z,int cordinate[][2],int turn_stored[],int t, int d); 		//pratam
+
 
 
 int main(int argc,char* argv[])
@@ -161,6 +165,9 @@ int main(int argc,char* argv[])
    								i = junc_check(l);
    								if(i != -1)		//old node
    								{	//find the nearest node		
+   									int z= find( explore, type, cordinate, i , total_points);//block for finding cordinate;
+									i = travel( z, cordinate,turn_stored, t,i);
+   									break;	
    								}		
    								else				//new node
    								{
@@ -201,7 +208,7 @@ int main(int argc,char* argv[])
    								{
    									int v=0;
    									unexplored_turn = old_node(i);
-   									if(unexplored_turn != 0)
+   									if(unexplored_turn != 0 && unexplored_turn != -2)
    									{
    									while(simxGetConnectionId(clientID)!=-1)
 		                			{   //reading sensors
@@ -221,7 +228,7 @@ int main(int argc,char* argv[])
 											}
 											break;
 										}
-									}	
+									}
 									}	//turns left
    									break;
       							}
@@ -277,7 +284,9 @@ int main(int argc,char* argv[])
        								l = encoder_value();
    									i = junc_check(l);
    									if(i != -1)		//old node
-   									{	//find the nearest node	
+   									{	//finding nearest node
+   										int z= find( explore, type, cordinate, i , total_points);//block for finding cordinate;
+										i = travel( z, cordinate,turn_stored, t,i);
    										break;	
    									}	
    									else				//new node
@@ -320,7 +329,7 @@ int main(int argc,char* argv[])
        			 					{
        			 						int v=0;
    										unexplored_turn = old_node(i);
-   										if(unexplored_turn !=0)
+   										if(unexplored_turn != 0 && unexplored_turn != -2)
    										{
    										while(simxGetConnectionId(clientID)!=-1)
 		                				{   //reading sensors
@@ -387,7 +396,7 @@ int main(int argc,char* argv[])
        			 				{
        			 					int v=0;
    									unexplored_turn = old_node(i);
-   									if(unexplored_turn !=0)
+   									if(unexplored_turn != 0 && unexplored_turn != -2)
    									{
    									while(simxGetConnectionId(clientID)!=-1)
 		                			{   //reading sensors
@@ -450,7 +459,7 @@ int main(int argc,char* argv[])
        			 				{
        			 					int v=0;
    									unexplored_turn = old_node(i);
-   									if (unexplored_turn !=0)
+   									if (unexplored_turn != 0 && unexplored_turn != -2)
    									{
    									while(simxGetConnectionId(clientID)!=-1)
 		                			{   //reading sensors
@@ -629,7 +638,7 @@ int main(int argc,char* argv[])
 		printf("unexplored_turns = %d \n", unexplored[i]);
 	}
 	printf("t= %d\n", t);
-	for(i = 0;i<t;i++)
+	for(i = 0;i<3000;i++)
 	{
 		printf("turns stored = %d \n", turn_stored[t]);
 	}
@@ -907,7 +916,7 @@ int old_node(int i)
    											
    											
    											//for getting the path where the bot has to move
-   											int unexplored_turn=0,target=0;
+   											int unexplored_turn=-2,target=0;
    											if(explore[i] < type[i])
    											{
    												if(path_type[i][1] == -1)
@@ -940,7 +949,9 @@ int old_node(int i)
    											}	
    											else if(explore[i] == type[i])
    											{
-   												//finding nearest node
+	   												//finding nearest node                  
+													int z= find( explore, type, cordinate, i , total_points);//block for finding cordinate;
+													i = travel( z, cordinate,turn_stored, t,i);
    											}
    											unexplored[m] = unexplored_turn;
    											m++;
@@ -1002,9 +1013,310 @@ int turn(int clientID, int leftMotorHandle,int rightMotorHandle,int leftMotorSpe
 } 												
    												
    												
-   												
-   												
-   												
+int find(int explore[],int type[],int cordinate[][2],int k,int total_points)
+{
+	int x,y,x1,y1,min,final;
+	x=cordinate[k][0];
+	y=cordinate[k][1];
+	min=1000000;
+
+	for(int a=0;a< total_points;a++)
+	{
+		if(a!=k)
+		{
+			if(explore[a]<type[a])
+			{
+	  			x1=cordinate[a][0];
+	  			y1=cordinate[a][1];
+	  			int xdiff,ydiff;		  
+	  			xdiff=(x1-x); 
+	  			ydiff=(y1-y);
+				if(xdiff<0)
+	    			xdiff=xdiff*(-1);
+				if(ydiff<0)
+		    		ydiff=ydiff*(-1);
+				if((xdiff+ydiff)<min)
+				{
+					min=(xdiff+ydiff);
+					final=a;
+				}
+			}	
+		}
+	}
+	return final;
+}
+				
+						
+int travel(int z,int cordinate[][2],int turn_stored[],int t, int d)
+{
+    float *sensor_values;
+	t--;
+	int v;
+	int turn_speed=1;
+	int speed=1;
+	int x,y,x1,y1,c,count;
+	count=0;
+	c=0;
+	x=cordinate[z][0];
+	y=cordinate[z][1];
+	y1=cordinate[d][1];
+	x1=cordinate[d][0];
+	//left turn-> pure right , straight right,
+	//right turn->pure left , straight left.
+	//two turns->any direction 2 lines->t shape,junction.
+	sensor_values = read_sensors(clientID, sensor);
+
+	if(sensor_values[0]>0.4&&sensor_values[1]<0.4&&sensor_values[2]<0.4&&sensor_values[3]<0.4)
+	{
+		while(simxGetConnectionId(clientID)!=-1)
+ 		{
+ 			sensor_values = read_sensors(clientID, sensor);
+ 			if(sensor_values[0]>0.4&&sensor_values[1]<0.4&&sensor_values[2]<0.4&&sensor_values[3]>0.4)
+ 				break;
+ 			else
+ 				move(clientID,leftMotorHandle,rightMotorHandle, -1*turn_speed ,turn_speed);  
+		}
+	}
+
+	if(sensor_values[0]<0.4&&sensor_values[1]<0.4&&sensor_values[2]<0.4&&sensor_values[3]>0.4)
+	{
+ 		while(simxGetConnectionId(clientID)!=-1)
+ 		{
+ 			sensor_values = read_sensors(clientID, sensor);
+ 			if(sensor_values[0]>0.4&&sensor_values[1]<0.4&&sensor_values[2]<0.4&&sensor_values[3]>0.4)
+ 				break;
+ 			else
+				move(clientID,leftMotorHandle,rightMotorHandle, turn_speed ,-1*turn_speed);  
+ 		}
+	}
+
+	if(sensor_values[0]<0.4&&sensor_values[1]<0.4&&sensor_values[2]<0.4&&sensor_values[3]<0.4)
+	{     
+         while(simxGetConnectionId(clientID)!=-1)
+         {
+			if( (sensor_values[0]>0.4&&sensor_values[1]<0.4&&sensor_values[2]<0.4&&sensor_values[3]>0.4)||(sensor_values[0]>0.4&&sensor_values[1]>0.4&&sensor_values[2]>0.4&&sensor_values[3]>0.4))
+			{
+				while(1)
+				{
+					move(clientID,leftMotorHandle,rightMotorHandle, turn_speed ,-1*turn_speed);
+					count++;
+					if(count==100)
+					{
+						count=0;
+						break;
+					}
+				}	
+				break;
+			}	
+			else
+				move(clientID,leftMotorHandle,rightMotorHandle, turn_speed ,turn_speed);
+		}
+        
+        while(simxGetConnectionId(clientID)!=-1)
+        {
+   			sensor_values = read_sensors(clientID, sensor);
+   
+			if(sensor_values[0]>0.4&&sensor_values[1]<0.4&&sensor_values[2]<0.4&&sensor_values[3]>0.4)
+			{  
+   				c++;
+   				if(c==2)
+   				{
+     				c=0;
+     				break;
+   				}
+   				while(1)
+				{
+					move(clientID,leftMotorHandle,rightMotorHandle, turn_speed ,-1*turn_speed);
+					count++;
+					if(count==100)
+					{
+						count=0;
+						break;
+					}
+				}
+			}
+			else
+				move(clientID,leftMotorHandle,rightMotorHandle, turn_speed ,-1*turn_speed);
+		}
+	}
+
+
+	while(simxGetConnectionId(clientID)!=-1)
+	{
+				sensor_values = read_sensors(clientID, sensor);
+				//straight line
+				int all_black_flag = 1;
+    			float weighted_sum = 0, sum = 0, pos = 0;
+    	 	
+    		 	for(int i = 0; i < 4; i++)
+    		 	{
+    	    		if(sensor_values[i] < 0.4)
+        				all_black_flag = 0;
+       				weighted_sum += (float)(sensor_values[i]) * (weights[i]);//weights
+       				sum += sensor_values[i];
+      			}	
+    			if(sum != 0)
+    			pos = weighted_sum / sum;
+	
+				if(all_black_flag == 1)
+    			{
+       				if(yaw_error > 0)//yaw error
+           				pos = 0.15;
+       				else
+           				pos = -0.15;
+   				}
+
+   				yaw_error = pos;
+       			//calculating_yaw_correction :-			
+       			//yaw_error *= 10;
+    			yaw_difference = (yaw_error - yaw_prev_error);//yaw diference
+    			yaw_cumulative_error += yaw_error;
+   	
+    			if(yaw_cumulative_error > 0.3)
+    			    yaw_cumulative_error = 0.3;
+        
+    			else if(yaw_cumulative_error < -0.3)
+    			    yaw_cumulative_error = -0.3;
+    	
+				yaw_correction = yaw_kP*yaw_error + yaw_kI*yaw_cumulative_error + yaw_kD*yaw_difference;
+				yaw_prev_error = yaw_error;
+			
+        		right_pwm = constrain((speed+ yaw_correction), MIN_PWM, MAX_PWM);
+        		left_pwm = constrain((speed-yaw_correction), MIN_PWM, MAX_PWM);
+                       
+        	    //Extra yaw correction during turns
+        		if(yaw_error>0.05)
+        		{
+        			right_pwm-=0.3;
+        		    left_pwm+=0.3;   
+        		}
+        		else if(yaw_error<0.05)
+        		{
+        		    left_pwm-=0.3;
+        		    right_pwm+=0.3;
+        		}
+                
+        		move(clientID,leftMotorHandle,rightMotorHandle,left_pwm,right_pwm);
+		   
+	
+	if((sensor_values[0]<0.4 && sensor_values[1]<0.4 && sensor_values[2]<0.4 && sensor_values[3]>0.4)||(sensor_values[0]>0.4 && sensor_values[1]<0.4 && sensor_values[2]<0.4 && sensor_values[3]<0.4)||(sensor_values[0]<0.4 && sensor_values[1]<0.4 && sensor_values[2]<0.4 && sensor_values[3]<0.4))		
+	{	
+		if(sensor_values[0]>0.4 && sensor_values[3]>0.4)	
+		{
+      		if(turn_stored[t]==30)
+			{ 
+				t--;
+    			while(simxGetConnectionId(clientID)!=-1)
+		        {   //reading sensors
+					sensor_values = read_sensors(clientID, sensor);
+					v = turn(clientID, leftMotorHandle, rightMotorHandle,-1*turn_speed,turn_speed, 0 ,sensor_values); 
+					if(v==1)
+					{ //direction					 
+                    	direction=(direction==4)?1:(direction-1);
+         				break;
+					}
+				}	
+				//x1=x1-5;
+				if(direction==1)
+					x1=x1+5;
+				if(direction==2)
+					y1=y1+5;
+				if(direction==3)
+					x1=x1-5;
+				if(direction==4)
+					y1=y1-5;
+				if(x1==x&&y1==y)
+					return z;
+			}
+
+
+ 			if(turn_stored[t]==10)
+			{ 
+				t--;
+    			while(simxGetConnectionId(clientID)!=-1)
+		        {   //reading sensors
+					sensor_values = read_sensors(clientID, sensor);
+					v = turn(clientID, leftMotorHandle, rightMotorHandle,turn_speed,-1*turn_speed, 0 ,sensor_values); 
+					if(v==1)
+					{
+						direction=(direction==4)?1:(direction+1);
+						break;
+					}
+				}
+				if(direction==1)
+					x1=x1+5;
+				if(direction==2)
+					y1=y1+5;
+				if(direction==3)
+					x1=x1-5;
+				if(direction==4)
+					y1=y1-5;		
+				if(x1==x&&y1==y)
+					return z;
+				//x1=x1+5;
+			}
+
+
+ 			if(turn_stored[t]==20)
+			{ 
+				t--;
+    			while(simxGetConnectionId(clientID)!=-1)
+		      	{   //reading sensors
+					sensor_values = read_sensors(clientID, sensor);
+					v = turn(clientID, leftMotorHandle, rightMotorHandle,turn_speed,turn_speed, 0 ,sensor_values); 
+					if(v==1)
+							break;
+				}
+
+                if(direction==1)
+					x1=x1+5;
+				if(direction==2)
+					y1=y1+5;
+				if(direction==3)
+					x1=x1-5;
+				if(direction==4)
+					y1=y1-5;
+				if(x==x1&&y==y1)
+					return z;
+			}
+
+
+ 			if(turn_stored[t]==40)
+			{ 
+				t--;
+    			while(simxGetConnectionId(clientID)!=-1)
+		        {   //reading sensors
+					sensor_values = read_sensors(clientID, sensor);
+					v = turn(clientID, leftMotorHandle, rightMotorHandle,-1*turn_speed,turn_speed, 0 ,sensor_values); 
+					if(v==1)
+					{ 
+						direction = (direction>2)?(direction-2):direction;
+						if(direction==1)
+							direction=3;
+						if(direction==2)
+							direction=4;				   
+						break;
+					}
+				}	
+				if(direction==1)
+					x1=x1+5;
+				if(direction==2)
+					y1=y1+5;
+				if(direction==3)
+					x1=x1-5;
+				if(direction==4)
+					y1=y1-5;
+				if(x==x1&&y==y1)
+					return z;
+			}
+			
+		}	
+		else
+  			move(clientID,leftMotorHandle,rightMotorHandle, turn_speed ,turn_speed);
+		}//if ends node check vala
+	}
+}
+ 												
    												
    												
    												
