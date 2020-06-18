@@ -37,9 +37,8 @@ int explore[100]={1};
 int i=-1;
 int x=0,y=0,total_points=0;		//x,y -> coordinate-distance
 int direction = 1;
+int expo;
 
-									int bhu;
-									int expo;
 //for bot's motion func
 float turn_speed=1;
 
@@ -57,14 +56,14 @@ float constrain(float x, float lower_limit, float higher_limit);
 //for turn func
 int sensor[5];
 int b;											
-												int unexplored[100]={0};
-												int m;
+int unexplored[100]={0};
+int m;
 //in same file
 int junc_check();
 int old_node(int i, int expo, int turn_stored[],int t);
 int turn(int clientID, int leftMotorHandle,int rightMotorHandle,int leftMotorSpeed,int rightMotorSpeed, int count);
-int find(int explore[],int type[],int cordinate[][2],int k,int total_points);		//pratam
-int travel(int z,int cordinate[][2],int turn_stored[],int t, int d, int expo); 		//pratam
+int find(int explore[],int type[],int cordinate[][2],int k,int total_points);		
+int travel(int z,int cordinate[][2],int turn_stored[],int t, int d, int expo); 	
 
 
 
@@ -359,11 +358,11 @@ int main(int argc,char* argv[])
 											}																
 										}		//turns left
    										if(unexplored_turn == 20)
-   												{
+   										{
    														
-   														turn_stored[t] = 20;
-   														t++;
-   												}
+   											turn_stored[t] = 20;
+   											t++;
+   										}
       								}
       								else				//new node
    									{
@@ -485,11 +484,10 @@ int main(int argc,char* argv[])
 											
 									}	//turns left
    									if(unexplored_turn == 20)
-   												{
-   														
-   														turn_stored[t] = 20;
-   														t++;
-   												}
+   									{	
+   										turn_stored[t] = 20;
+   										t++;
+   									}
    									node_detected = 1;
        			 				}
        			 				else				//new node
@@ -530,16 +528,11 @@ int main(int argc,char* argv[])
             			if(sensor_values[0]>0.5 && sensor_values[1]>0.2 && sensor_values[2]>0.2 && sensor_values[3]>0.5)
             			{
             			
-            				while(1)
+            				while(count<=600000)
 							{
-									move(clientID,leftMotorHandle,rightMotorHandle,-1*turn_speed,turn_speed);
-									count++;
-									if(count==600000)
-									{
-										bhu=3000;
-										count=0;
-										break;
-									}
+								move(clientID,leftMotorHandle,rightMotorHandle,-1*turn_speed,turn_speed);
+								count++;
+								
 							}	
 							while(simxGetConnectionId(clientID)!=-1)
 							{
@@ -548,9 +541,6 @@ int main(int argc,char* argv[])
 								{	//straight line
 									int j =-1, sign;
 									l = encoder_value();
-                   // direction=(direction+2)%4;
-                   // if(direction==0)
-                   // direction=4;
                   
 									sign = (direction<=2) ? 1 : (-1);
 									if( direction == 1 || direction == 3)   //north direction
@@ -572,7 +562,8 @@ int main(int argc,char* argv[])
 									printf("dead end aaya so left turn\n");
             		        	   	move(clientID,leftMotorHandle,rightMotorHandle,-1*turn_speed,turn_speed);		//turns 180 left turn
 								}
-							}	
+							}
+							break;	
             			}		
             			else 
             				break;
@@ -620,7 +611,7 @@ int main(int argc,char* argv[])
 	{
 		printf("turns stored = %d \n", turn_stored[i]);
 	}
-	printf("bhu= %d \n", bhu);
+
 	for(i=0;i<all_cordinate_index;i++)
 	{
 		printf("x= %d y=%d \n", all_cordinate[i][0], all_cordinate[i][1]);
@@ -716,99 +707,83 @@ int move(int clientID,int leftMotorHandle,int rightMotorHandle,float left_pwm,fl
 //general
 int old_node(int i, int expo, int turn_stored[], int t)
 {
-											int dl=-1,dr=-1,dir;
-   											dir = init_direction[i];		//initial direction of bot on that node
-   											dl = (dir==1)? 4 : (dir-1);
-   											//dr = (dir==4)? 1 :	(dir+1);
+	int dl=-1,dr=-1,dir;
+   	dir = init_direction[i];		//initial direction of bot on that node
+   	dl = (dir==1)? 4 : (dir-1);
+   									
+   	//for getting the path from where the bot has come
+   	if((direction - dir) == 2 || (direction-dir)==(-2))
+   	{	//bot has explore the straight path
+   		if (path_type[i][1] == -1)
+   			explore[i]+=1;
+   		path_type[i][1] = 1;
+   	}
+   	else if(direction == dl)
+	{	//bot has explore the right path   			
+		if (path_type[i][2] == -1)
+   			explore[i]+=1;
+   		path_type[i][2]=1;
+   	}
    											
-   											//for getting the path from where the bot has come
-   											if((direction - dir) == 2 || (direction-dir)==(-2))
-   											{	//bot has explore the straight path
-   												if (path_type[i][1] == -1)
-   													explore[i]+=1;
-   												path_type[i][1] = 1;
-   											}
-   											else if(direction == dl)
-   											{	//bot has explore the right path
-   												if (path_type[i][2] == -1)
-   													explore[i]+=1;
-   												path_type[i][2]=1;
-   											}
-   											
-   											
-   											
-   											//for getting the path where the bot has to move
-   											int unexplored_turn=-2,target=0;
-   											if(explore[i] < type[i])
-   											{
-   												if(path_type[i][1] == -1)
-   												{
-   													unexplored_turn = (dir - direction);
-   													explore[i]+=1;
-   													path_type[i][1] = 1;
-   												}
-   												else if(path_type[i][2] == -1)
-   												{
-   													target = (dir==4)?1:(dir+1);	//jaha jana h
-   													unexplored_turn = target - direction;
-   													explore[i]+=1;
-   													path_type[i][2] = 1;
-   												}	
-   												if(unexplored_turn == 0)
-   													unexplored_turn = 20;
-   												else if(unexplored_turn== -3 || unexplored_turn == 3)
-   													unexplored_turn = -1*unexplored_turn/3;									
-   											}	
-   											else if(explore[i] == type[i])
-   											{
-   													bhu=4;
-	   												//finding nearest node                  
-													int z;
-													z= find( explore, type, cordinate, i , total_points);//block for finding cordinate;
-													i = travel( z, cordinate,turn_stored, t,i,expo);
-   											}
-   											unexplored[m] = unexplored_turn;
-   											m++;
-   											return  unexplored_turn;
+	//for getting the path where the bot has to move
+   	int unexplored_turn=-2,target=0;
+   	if(explore[i] < type[i])
+   	{
+   		if(path_type[i][1] == -1)
+   		{
+   			unexplored_turn = (dir - direction);
+   			explore[i]+=1;
+   			path_type[i][1] = 1;
+   		}
+   		else if(path_type[i][2] == -1)
+   		{
+   			target = (dir==4)?1:(dir+1);	//jaha jana h
+   			unexplored_turn = target - direction;
+   			explore[i]+=1;
+   			path_type[i][2] = 1;
+   		}
+
+   		if(unexplored_turn == 0)
+   			unexplored_turn = 20;
+   		else if(unexplored_turn== -3 || unexplored_turn == 3)
+   			unexplored_turn = -1*unexplored_turn/3;									
+	}	
+   																					   
+	else if(explore[i] == type[i])
+   	{  								
+	   	//finding nearest node                  
+		int z;
+		z= find( explore, type, cordinate, i , total_points); //block for finding cordinate;
+		i = travel( z, cordinate,turn_stored, t,i,expo);
+   	}
+   	unexplored[m] = unexplored_turn;
+   	m++;
+   	return  unexplored_turn;
 }  												
    												
 int turn(int clientID, int leftMotorHandle,int rightMotorHandle,int leftMotorSpeed,int rightMotorSpeed, int count)
 {
 	int v=0;
 	float *sensor_values;
-	while(1)
+	while(count<=20)
 	{
-		//straight line
-			move(clientID,leftMotorHandle,rightMotorHandle,0.01,0.01);
-           	
+		move(clientID,leftMotorHandle,rightMotorHandle,0.01,0.01);   	
 		count++;
-		if(count==10)
-		{
-			count=0;
-			break;
-		}
 	}
-	while(1)
-		{
+	while(count<=600000)
+	{
+		move(clientID,leftMotorHandle,rightMotorHandle,leftMotorSpeed,rightMotorSpeed);
+		count++;
+	}	
+	while(simxGetConnectionId(clientID)!=-1)
+	{
+ 		sensor_values = read_sensors(clientID, sensor);
+ 		if(sensor_values[0]>0.5 &&sensor_values[1]<0.5 &&sensor_values[2]<0.5 &&sensor_values[3]>0.5)
+ 			break;
+ 		
+ 		else
 			move(clientID,leftMotorHandle,rightMotorHandle,leftMotorSpeed,rightMotorSpeed);
-			count++;
-			if(count==600000)
-			{
-				bhu=3000;
-				count=0;
-				break;
-			}
-		}	
-		while(simxGetConnectionId(clientID)!=-1)
- 		{
- 			bhu=500;
- 			sensor_values = read_sensors(clientID, sensor);
- 			if(sensor_values[0]>0.5 &&sensor_values[1]<0.5 &&sensor_values[2]<0.5 &&sensor_values[3]>0.5)
- 				break;
- 			
- 			else
-			move(clientID,leftMotorHandle,rightMotorHandle,leftMotorSpeed,rightMotorSpeed);
-		}
+	}	
 
 } 												
    												
@@ -819,7 +794,7 @@ int find(int explore[],int type[],int cordinate[][2],int k,int total_points)
 	x=cordinate[k][0];
 	y=cordinate[k][1];
 	min=1000000;
-	bhu= 150;
+	
 	for(int a=0;a< total_points;a++)
 	{
 		if(a!=k)
@@ -847,14 +822,13 @@ int find(int explore[],int type[],int cordinate[][2],int k,int total_points)
 }
 				
 						
-int travel(int z,int cordinate[][2],int turn_stored[],int t, int d, int expo)
+int travel(int z,int cordinate[][2],int turn_stored[],int t, int d, int expo)	//function for retracing
 {
     float *sensor_values;
 	int v;
 	float turn_speed=1;
 	int speed=0;
 	int x2,y2,x1,y1,c,count,l;
-	bhu=300;
 	count=0;
 	c=0;
 	int ab=0;
@@ -865,28 +839,17 @@ int travel(int z,int cordinate[][2],int turn_stored[],int t, int d, int expo)
 	
 	if(expo==100)
 	{
-		int bb=0;
-		while(1)
+		while(count<=1000000)
 		{
 			move(clientID,leftMotorHandle,rightMotorHandle, turn_speed ,-1*turn_speed);
 			count++;
-			if(count==1000000)
-			{
-				bhu=3000;
-				count=0;
-				break;
-			}
 		}	
 		while(simxGetConnectionId(clientID)!=-1)
  		{
- 			bhu=500;
  			sensor_values = read_sensors(clientID, sensor);
  			if(sensor_values[0]>0.4&&sensor_values[1]<0.4&&sensor_values[2]<0.4&&sensor_values[3]>0.4)
- 			{	
- 				bhu=1000;
+ 			{
  				direction = (direction>2)?(direction-2):(direction+2);
- 				//turn_stored[t] = 40;
-				//t++;
  				break;
  			}
  			else
@@ -897,29 +860,18 @@ int travel(int z,int cordinate[][2],int turn_stored[],int t, int d, int expo)
 	if(expo==200)
 	{
 		int bb=0;
-		while(1)
+		while(count<=1000000)
 		{
 			move(clientID,leftMotorHandle,rightMotorHandle,-1*turn_speed ,turn_speed);
 			count++;
-			if(count==1000000)
-			{
-				bhu=3000;
-				count=0;
-				break;
-			}
 		}	
  		while(simxGetConnectionId(clientID)!=-1)
  		{
- 			//printf("dekho mein aa gya\n");
  			sensor_values = read_sensors(clientID, sensor);
  			if(sensor_values[0]>0.4&&sensor_values[1]<0.4&&sensor_values[2]<0.4&&sensor_values[3]>0.4)
  			{
- 				
- 					direction = (direction>2)?(direction-2):(direction+2);
- 				//turn_stored[t] = 40;
-				//t++;
- 					break;
- 				
+ 				direction = (direction>2)?(direction-2):(direction+2);
+ 				break;
  			}
  			else
 				move(clientID,leftMotorHandle,rightMotorHandle,-1* turn_speed ,turn_speed);  
@@ -928,16 +880,10 @@ int travel(int z,int cordinate[][2],int turn_stored[],int t, int d, int expo)
 
 	if(expo==300 || expo==400)
 	{     
-		while(1)
+		while(count<=1000000)
 		{
 			move(clientID,leftMotorHandle,rightMotorHandle,-1*turn_speed ,turn_speed);
 			count++;
-			if(count==1000000)
-			{
-				bhu=3000;
-				count=0;
-				break;
-			}
 		}	
         
         while(simxGetConnectionId(clientID)!=-1)
@@ -953,16 +899,12 @@ int travel(int z,int cordinate[][2],int turn_stored[],int t, int d, int expo)
    					{
      					c=0;
      					direction = (direction>2)?(direction-2):(direction+2);
- 						//turn_stored[t] = 40;
-						//t++;
      					break;
    					}
    				}
    				else
    				{
    					direction = (direction>2)?(direction-2):(direction+2);
- 					//turn_stored[t] = 40;
-					//t++;
  					break;
    				}
 			}
@@ -974,132 +916,35 @@ int travel(int z,int cordinate[][2],int turn_stored[],int t, int d, int expo)
 	int turn_taken=-1;
 	while(simxGetConnectionId(clientID)!=-1)
 	{
-				sensor_values = read_sensors(clientID, sensor);
-				//straight line
-				pid_control(sensor_values);
-        		
-        		while(lap_time< 5000 && turn_taken==1)
-        		{
-        			lap_time++;
-        			pid_control(sensor_values);
-        			
-        		}
-        		turn_taken=0;
+		sensor_values = read_sensors(clientID, sensor);
+		//straight line
+		pid_control(sensor_values);
+        
+        while(lap_time< 5000 && turn_taken==1)
+        {
+        	lap_time++;
+        	pid_control(sensor_values);
+		}     		
+		turn_taken=0;
 		   
-	ab = t-1;
-	/*if(sensor_values[0]<0.5 && sensor_values[1]<0.5 && sensor_values[2]<0.5 && sensor_values[3]>0.6)
-	{	
-		while(simxGetConnectionId(clientID)!=-1)
-		{
-			sensor_values = read_sensors(clientID, sensor);
-			if((sensor_values[0]>0.5 && sensor_values[1]>0.5 && sensor_values[2]>0.5 && sensor_values[3]>0.5) || (sensor_values[3]>0.4 && sensor_values[1]>0.4 && sensor_values[2]>0.4 && sensor_values[0]>0.4))	
-			{
-				check_all[abc] = turn_stored[ab];
-				abc++;
-				
-      			if(turn_stored[ab]==30)
-				{ 
-					ab--;
-					turn_taken=1;
-					int j =-1, sign;
-					l = encoder_value();
-					sign = (direction<=2) ? 1 : (-1);
-						if( direction == 1 || direction == 3)   //north direction
-    					y2 = y2 + (sign)*l;     //changing y-coordinate
-    				else 
-     					x2 = x2 + (sign)*l;     //changing x-coordinate
-						all_cordinate[all_cordinate_index][0] = x2;
-					all_cordinate[all_cordinate_index][1] = y2;
-				   	all_cordinate_index+=1;	
-					if(x2==x1 && y2==y1)
-						return z;
-    				turn(clientID, leftMotorHandle, rightMotorHandle,-1*turn_speed,turn_speed, 0);
-					direction=(direction==1)?4:(direction-1);
-					break;
-				}
-
-
- 				else if(turn_stored[ab]==10)
-				{ 
-					ab--;
-					turn_taken=1;
-					int j =-1, sign;
-					l = encoder_value();
-					sign = (direction<=2) ? 1 : (-1);
-					if( direction == 1 || direction == 3)   //north direction
-    						y2 = y2 + (sign)*l;     //changing y-coordinate
-    				else 
-     					x2 = x2 + (sign)*l;     //changing x-coordinate
-					all_cordinate[all_cordinate_index][0] = x2;
-					all_cordinate[all_cordinate_index][1] = y2;
-				   	all_cordinate_index+=1;	
-					if(x2==x1 && y2==y1)
-						return z;
-		   			turn(clientID, leftMotorHandle, rightMotorHandle,turn_speed,-1*turn_speed, 0);
-					direction=(direction==4)?1:(direction+1);
-					break;
-				}
-
-
- 				else if(turn_stored[ab]==20)
-				{ 
-					ab--;
-					turn_taken=1;
-	   		        int j =-1, sign;
-    	           	l = encoder_value();
-					sign = (direction<=2) ? 1 : (-1);
-					if( direction == 1 || direction == 3)   //north direction
-    					y2 = y2 + (sign)*l;     //changing y-coordinate
-    				else 
-     					x2 = x2 + (sign)*l;     //changing x-coordinate
-					all_cordinate[all_cordinate_index][0] = x2;
-					all_cordinate[all_cordinate_index][1] = y2;
-		   			all_cordinate_index+=1;	
-					if(x2==x1 && y2==y1)
-						return z;
-					break;
-				}
-	
- 				else if(turn_stored[ab]==40)
-				{ 
-					ab--;
-					turn_taken=1;
-   					int j =-1, sign;
-    				l = encoder_value();
-					sign = (direction<=2) ? 1 : (-1);
-					if( direction == 1 || direction == 3)   //north direction
-   	 					y2 = y2 + (sign)*l;     //changing y-coordinate
-    				else 
-     					x2 = x2 + (sign)*l;     //changing x-coordinate
-					all_cordinate[all_cordinate_index][0] = x2;
-						all_cordinate[all_cordinate_index][1] = y2;
-				   	all_cordinate_index+=1;	
-					if(x2==x1 && y2==y1)
-						return z;
-					turn(clientID, leftMotorHandle, rightMotorHandle,-1*turn_speed,turn_speed, 0); 
-					turn(clientID, leftMotorHandle, rightMotorHandle,-1*turn_speed,turn_speed, 0); 
-					direction = (direction>2)?(direction-2):(direction+2);	
-					break;	
-				}
-			
-			}	
-			else
-  				move(clientID,leftMotorHandle,rightMotorHandle, turn_speed ,turn_speed);
-  		}
-	}//if ends node check vala
-	*/
-	
-		
+		ab = t-1;
 		if(sensor_values[0]>0.6 && sensor_values[1]<0.6 && sensor_values[2]<0.6 && sensor_values[3]>0.6)			//loop for detecting dead end 
 		{
 			while(simxGetConnectionId(clientID)!=-1)
         	{   //reading sensors
+        		printf("dead end ke andar checking if aage end aaya kya \n");
 				sensor_values = read_sensors(clientID, sensor);
-				printf("deadend ke andar checking if aage end aaya kya \n");
         		if(sensor_values[0]>0.5 && sensor_values[1]>0.2 && sensor_values[2]>0.2 && sensor_values[3]>0.5)
         		{
+					count = 0;
+					while(count<=600000)
+					{			
+						move(clientID,leftMotorHandle,rightMotorHandle,-1*turn_speed,turn_speed);
+						count++;		
+					}	
 					while(simxGetConnectionId(clientID)!=-1)
 					{
+						printf("u-turn le rha h \n");
 						sensor_values = read_sensors(clientID, sensor);
         				if(sensor_values[0]>0.7 && sensor_values[1]<0.4 && sensor_values[2]<0.4 && sensor_values[3]>0.7)			
 						{	//straight line
@@ -1128,6 +973,7 @@ int travel(int z,int cordinate[][2],int turn_stored[],int t, int d, int expo)
             		       	move(clientID,leftMotorHandle,rightMotorHandle,-1*turn_speed,turn_speed);		//turns 180 left turn
 						}
 					}	
+					break;
             	}		
             	else 
             		break;
@@ -1168,66 +1014,61 @@ int travel(int z,int cordinate[][2],int turn_stored[],int t, int d, int expo)
 			
 		else if(sensor_values[3]<0.3 && sensor_values[1]<0.3 && sensor_values[2]<0.3 && sensor_values[0]<0.3)					//for junction or t-shape
 		{
-				while(simxGetConnectionId(clientID)!=-1)
-            	{   //reading sensors
-					sensor_values = read_sensors(clientID, sensor);
-
-					if(sensor_values[0]<0.3 && sensor_values[1]<0.3 && sensor_values[2]<0.3 && sensor_values[3]<0.3)
-					{	printf("j/t khtm hone tak straight\n");
-                    	move(clientID, leftMotorHandle, rightMotorHandle, turn_speed, turn_speed);
-					}
-					else
+			while(simxGetConnectionId(clientID)!=-1)
+        	{   //reading sensors
+				sensor_values = read_sensors(clientID, sensor);
+				if(sensor_values[0]<0.3 && sensor_values[1]<0.3 && sensor_values[2]<0.3 && sensor_values[3]<0.3)
+				{	printf("j/t khtm hone tak straight\n");
+                   	move(clientID, leftMotorHandle, rightMotorHandle, turn_speed, turn_speed);
+				}
+				else
+				{
+					if((sensor_values[0]>0.7 && sensor_values[1]>0.7 && sensor_values[2]>0.7 && sensor_values[3]>0.7) || (sensor_values[0]>0.7 && sensor_values[1]<0.7 && sensor_values[2]<0.7 && sensor_values[3]>0.7))
 					{
-						int j =-1, sign;
-						l = encoder_value();
-						sign = (direction<=2) ? 1 : (-1);
-						if( direction == 1 || direction == 3)   //north direction
-    						y2 = y2 + (sign)*l;     //changing y-coordinate
-   						 else 
-     						x2 = x2 + (sign)*l;     //changing x-coordinate
-     					all_cordinate[all_cordinate_index][0] = x2;
-     					all_cordinate[all_cordinate_index][1] = y2;
-     					all_cordinate_index+=1;
-     					if(x2==x1 && y2==y1)
-     						return z;
-     						
-						//if((sensor_values[0]>0.7 && sensor_values[1]>0.7 && sensor_values[2]>0.7 && sensor_values[3]>0.7)	|| (sensor_values[0]>0.7 && sensor_values[1]<0.7 && sensor_values[2]<0.7 && sensor_values[3]>0.7))	
-						//{
-				
-							if(turn_stored[ab] == 10)
-							{
-								turn(clientID, leftMotorHandle, rightMotorHandle,turn_speed,-1*turn_speed, 0);
-								direction = (direction==4)?1:(direction+1);
-								check_all[abc] = 30;
-								turn_taken=1;
-								abc++;
-					
-								ab--;
-								break;
-							}
-							
-							else if(turn_stored[ab] == 30)
-							{
-								turn(clientID, leftMotorHandle, rightMotorHandle,-1*turn_speed,turn_speed, 0);
-								direction = (direction==1)?4:(direction-1);
-								check_all[abc] = 10;
-								turn_taken=1;
-								abc++;
-					
-								ab--;
-								break;
-							}	
-							
-							else if(turn_stored[ab] == 20)
-							{
-								check_all[abc] = 20;
-								turn_taken=1;
-								abc++;
-					
-								ab--;
-								break;
-							}						
-       				//}
+					int j =-1, sign;
+					l = encoder_value();
+					sign = (direction<=2) ? 1 : (-1);
+					if( direction == 1 || direction == 3)   //north direction
+    					y2 = y2 + (sign)*l;     //changing y-coordinate
+   					 else 
+     					x2 = x2 + (sign)*l;     //changing x-coordinate
+     				all_cordinate[all_cordinate_index][0] = x2;
+     				all_cordinate[all_cordinate_index][1] = y2;
+     				all_cordinate_index+=1;
+     				if(x2==x1 && y2==y1)
+     					return z;
+     					
+					if(turn_stored[ab] == 10)
+					{
+						turn(clientID, leftMotorHandle, rightMotorHandle,turn_speed,-1*turn_speed, 0);
+						direction = (direction==4)?1:(direction+1);
+						check_all[abc] = 30;
+						turn_taken=1;
+						abc++;
+						ab--;
+						break;
+					}
+						
+					else if(turn_stored[ab] == 30)
+					{
+						turn(clientID, leftMotorHandle, rightMotorHandle,-1*turn_speed,turn_speed, 0);
+						direction = (direction==1)?4:(direction-1);
+						check_all[abc] = 10;
+						turn_taken=1;
+						abc++;
+						ab--;
+						break;
+					}	
+						
+					else if(turn_stored[ab] == 20)
+					{
+						check_all[abc] = 20;
+						turn_taken=1;
+						abc++;
+						ab--;
+						break;
+					}
+					}
        			}
        		}
 		}
@@ -1243,21 +1084,22 @@ int travel(int z,int cordinate[][2],int turn_stored[],int t, int d, int expo)
                    	pid_correction(sensor_values,3);
                 }
         		else
-        		{ 	 
-        			int j =-1, sign;
-					l = encoder_value();
-					sign = (direction<=2) ? 1 : (-1);
-					if( direction == 1 || direction == 3)   //north direction
-    					y2 = y2 + (sign)*l;     //changing y-coordinate
-   					 else 
-     					x2 = x2 + (sign)*l;     //changing x-coordinate
-     				all_cordinate[all_cordinate_index][0] = x2;
-     				all_cordinate[all_cordinate_index][1] = y2;
-     				all_cordinate_index+=1;
-     				if(x2==x1 && y2==y1)
-     					return z;               		
+        		{ 	 		
         		    if((sensor_values[0]>0.7 && sensor_values[1]>0.7 && sensor_values[2]>0.7 && sensor_values[3]>0.7) || (sensor_values[0]>0.7 && sensor_values[1]<0.4 && sensor_values[2]<0.4 && sensor_values[3]>0.7))
 					{
+						int j =-1, sign;
+						l = encoder_value();
+						sign = (direction<=2) ? 1 : (-1);
+						if( direction == 1 || direction == 3)   //north direction
+    						y2 = y2 + (sign)*l;     //changing y-coordinate
+   					 	else 
+    	 					x2 = x2 + (sign)*l;     //changing x-coordinate
+     					all_cordinate[all_cordinate_index][0] = x2;
+     					all_cordinate[all_cordinate_index][1] = y2;
+     					all_cordinate_index+=1;
+     					if(x2==x1 && y2==y1)
+     						return z;       
+
 						if(turn_stored[ab] == 10)
 						{
 							turn(clientID, leftMotorHandle, rightMotorHandle,turn_speed,-1*turn_speed, 0);
@@ -1283,8 +1125,58 @@ int travel(int z,int cordinate[][2],int turn_stored[],int t, int d, int expo)
        			}
         	}
 		}
-       			
-       			
+		
+		if(sensor_values[0]<0.4 && sensor_values[1]<0.4 && sensor_values[2]<0.4 && sensor_values[3]>0.7)			//pure left or straight left turn
+		{           
+           	while(simxGetConnectionId(clientID)!=-1)
+           	{   //reading sensor values
+           		sensor_values = read_sensors(clientID, sensor);
+                                    
+				if(sensor_values[0]<0.4 && sensor_values[1]<0.4 && sensor_values[2]<0.4 && sensor_values[3]>0.7)	//getting till end of node
+         		{	printf("l/sl khtm hone tak straight\n");
+         			pid_correction(sensor_values,0);
+        		}
+                else
+     			{
+     			
+     				int j =-1, sign;
+					l = encoder_value();
+					sign = (direction<=2) ? 1 : (-1);
+					if( direction == 1 || direction == 3)   //north direction
+    					y2 = y2 + (sign)*l;     //changing y-coordinate
+   					else 
+     					x2 = x2 + (sign)*l;     //changing x-coordinate
+     				all_cordinate[all_cordinate_index][0] = x2;
+     				all_cordinate[all_cordinate_index][1] = y2;
+     				all_cordinate_index+=1;
+     				if(x2==x1 && y2==y1)
+     					return z;
+     						
+    				if((sensor_values[0]>0.7 && sensor_values[1]>0.7 && sensor_values[2]>0.7 && sensor_values[3]>0.7) || (sensor_values[0]>0.7 && sensor_values[1]<0.5 && sensor_values[2]<0.5 && sensor_values[3]>0.7))
+                  	{
+						if(turn_stored[ab] == 30)
+						{
+							turn(clientID, leftMotorHandle, rightMotorHandle,-1*turn_speed,turn_speed, 0);
+							direction = (direction==1)?4:(direction-1);
+							check_all[abc] = 10;
+							turn_taken=1;
+							abc++;
+							ab--;
+							break;
+						}	
+						
+						else if(turn_stored[ab] == 20)
+						{
+							check_all[abc] = 20;
+							turn_taken=1;
+							abc++;
+							ab--;
+							break;
+						}						
+       			 	}
+       			}
+       		}
+       	}
 	}
 }
  												
