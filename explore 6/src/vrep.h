@@ -5,7 +5,7 @@
 
 #include "extApi.h"
 #include "simConst.h"
-//#include "FUNC.h"
+
 #define PI 3.141593
 #define LEFT -1
 #define RIGHT 1
