@@ -80,7 +80,7 @@ int main(int argc,char* argv[])
 		extApi_sleepMs(5000);
 		return 0;
 	}
-	int turn_stored[300];			//to store all the turns			//10->left 20-> straight 30->right 40->u-turn
+	int turn_stored[300];			//to store all the turns	//10->left 20-> straight 30->right 40->u-turn
 	int t=0;
 	int l;
 	int unexplored_turn;
