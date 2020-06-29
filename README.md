@@ -20,7 +20,7 @@ Line following Maze solving bot with shortest path in CoppeliaSim environment
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
-[**maze solving screenshot**](https://github.com/Bhumika-Kothwal/Eklavya-2020--Slayers/tree/master/doc/results/result%20screenshots)  
+[**bot and maze screenshot**](https://github.com/Bhumika-Kothwal/Eklavya-2020--Slayers/tree/master/doc/results/result%20screenshots)  
 
 * **Aim**   
 To make a line following maze solving bot with shortest path algorithm using CoppeliaSim in C-language. 
@@ -70,7 +70,7 @@ GNU Make 4.1
 
 
 ### Installation
-1. Clone the repo
+Clone the repo
 ```sh
 git clone https://github.com/Bhumika-Kothwal/Eklavya-2020--Slayers.git
 ```
