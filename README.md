@@ -72,7 +72,7 @@ GNU Make 4.1
 ### Installation
 1. Clone the repo
 ```sh
-git clone https://github.com/your_username_/Project-Name.git
+git clone https://github.com/Bhumika-Kothwal/Eklavya-2020--Slayers.git
 ```
 
 
