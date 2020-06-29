@@ -23,7 +23,7 @@ Line following Maze solving bot with shortest path in CoppeliaSim environment
 [**maze solving screenshot**](https://github.com/Bhumika-Kothwal/Eklavya-2020--Slayers/tree/master/doc/results/result%20screenshots)  
 
 * **Aim**   
-Making a line following maze solving bot with shortest path algorithm in CoppeliaSim in C-language. 
+To make a line following maze solving bot with shortest path algorithm using CoppeliaSim in C-language. 
 * **Description of project**  
 We have made a bot which will be capable enough of exploring an unknown path on its own without any user interaction during the exploration.
 Our motive was to make a bot that can explore the maze and find the shortest path in the minimum time possible by traveling the minimum distance.
