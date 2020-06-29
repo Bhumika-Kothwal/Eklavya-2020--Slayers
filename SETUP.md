@@ -1,6 +1,6 @@
 <!-- SETUP INSTRUCTUIONS -->
 ## Setup Instructions
-* Installing make  
+### Installing make  
   * Run update command to update package repositories and get latest package information.
   ```sh
   $ sudo apt-get update -y
@@ -18,7 +18,7 @@
   /usr/bin/make
   ``` 
 
-* Installing gcc compiler for C file compilation 
+### Installing gcc compiler for C file compilation 
 
   * Start by updating the packages list
   ```sh
@@ -38,7 +38,7 @@
   ```
   
     
-* Setup of Coppelia-Sim Software
+### Downloading Coppelia-Sim Software
   * Download Coppelia-Sim Edu [here](https://www.coppeliarobotics.com/downloads) by choosing the correct platform.
   * If you are a Ubuntu user, follow the below steps for further set-up:  
       
