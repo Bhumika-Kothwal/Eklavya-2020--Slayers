@@ -27,7 +27,7 @@ To make a line following maze solving bot with shortest path algorithm using Cop
 * **Description of project**  
 We have made a bot which will be capable enough of exploring an unknown path on its own without any user interaction during the exploration.
 Our motive was to make a bot that can explore the maze and find the shortest path in the minimum time possible by traveling the minimum distance.
-Hence our project requires use of algorithms and data structures as the major part. We have used the Legacy Based Remote API for server side so that the written code is in C language.  
+Hence our project requires use of algorithms and data structures as the major part. We have used the Legacy Remote API for server side so that the written code is in C language.  
 
 Refer this [documentation](https://github.com/Bhumika-Kothwal/Eklavya-2020--Slayers/blob/master/doc/report.pdf)
 
@@ -118,7 +118,7 @@ git clone https://github.com/Bhumika-Kothwal/Eklavya-2020--Slayers.git
 ## Acknowledgements and Resources
 * [SRA VJTI](http://sra.vjti.info/) Eklavya 2020  
 * Refered [this](https://www.youtube.com/watch?v=PwGY8PxQOXY&list=PLjzuoBhdtaXOoqkJUqhYQletLLnJP8vjZ) for understanding and working with CoppeliaSim and for model of bot
-* Refered [this](https://www.coppeliarobotics.com/helpFiles/) for implementing Legacy Based Remote API and Remote API functions for C language.Below flowchart will help you access the required information from the page cited above.   
+* Refered [this](https://www.coppeliarobotics.com/helpFiles/) for implementing Legacy Remote API and Remote API functions for C language.Below flowchart will help you access the required information from the page cited above.   
 ```sh
     CoppeliaSim User Manual     
     ├── ...           
