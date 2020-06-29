@@ -1,18 +1,21 @@
 <!-- SETUP INSTRUCTUIONS -->
 ## Setup Instructions
-* Installing cmake  
-
-  * installing cmake using the ```apt-get``` command
+* Installing make  
+  * Run update command to update package repositories and get latest package information.
   ```sh
-  $ sudo apt-get -y install cmake
+  $ sudo apt-get update -y
+  ```
+  * installing make using the ```apt-get``` command
+  ```sh
+  $ sudo apt-get -y install make
   ```
   * You can verify if it is correctly installed by checking its version and the path where it is stored
   ```sh
-  $ cmake --version
-  cmake version 3.5.1
+  $ make --version
+  GNU Make 4.1
    
-  $ which cmake
-  /usr/bin/cmake
+  $ which make
+  /usr/bin/make
   ``` 
 
 * Installing gcc compiler for C file compilation 
