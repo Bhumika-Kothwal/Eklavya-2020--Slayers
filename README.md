@@ -100,7 +100,7 @@ git clone https://github.com/Bhumika-Kothwal/Eklavya-2020--Slayers.git
 ## Results
 
 [**result screenshots**](https://github.com/Bhumika-Kothwal/Eklavya-2020--Slayers/tree/master/doc/results/result%20screenshots)  
-[**result video**](https://github.com/Bhumika-Kothwal/Eklavya-2020--Slayers/tree/master/doc/results/result%20video)  
+[**result video**](https://www.youtube.com/playlist?list=PLDRAvRbQAX312fWge3vN-LI83FO4ckTx2)  
 
 
 <!-- FUTURE WORK -->
